@@ -1,0 +1,7 @@
+@use '@styles/mixins.scss';
+
+.reg {
+    &__container {
+        @include mixins.auth-container(5vh, 45%, 75vh);
+    }
+}

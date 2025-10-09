@@ -1,0 +1,7 @@
+@use '@styles/mixins.scss';
+
+.login {
+    &__container {
+        @include mixins.auth-container(10vh, 30%, 344px);
+    }
+}
