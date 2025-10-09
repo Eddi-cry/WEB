@@ -1,21 +1,10 @@
-# Виртуальное окружение
 venv/
-
-# Медиа и статика Django
 fullstak_django/media/
-fullstak_django/staticfiles/
 
-# Логи
-*.log
-gunicorn.log
 
-# Системные файлы
-.DS_Store
+# Python cache
 __pycache__/
 *.pyc
-*.pyo
 
-# IDE
-.vscode/
-.idea/
-EOF
+# Logs
+*.log
