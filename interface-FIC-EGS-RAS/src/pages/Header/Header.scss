@@ -1,5 +1,5 @@
-@use '@styles/variables.scss';
-@use '@styles/mixins.scss';
+@use "@styles/variables";
+@use "@styles/mixins";
 
 .header {
     &__container {
@@ -40,10 +40,7 @@
     &__link {
         color: variables.$black-color;
         text-decoration-color: variables.$link-inactive;
-        // font-size: variables.$font-size-s;
         transition: variables.$transition-slow text-decoration-color;
-
-        
 
         &:not(:last-child) {
             margin-right: 70px;
@@ -100,7 +97,6 @@
                 &:hover {
                     text-decoration-color: variables.$main-color;
                 }
-                
             }
         }
     }

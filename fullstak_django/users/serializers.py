@@ -14,7 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewUser
         fields = ('email', 'user_name', 'organization', 'password', 'password2')
-    
+
     def validate(self, data):
         if data['password'] != data['password2']:
             raise serializers.ValidationError("Passwords don't match")
@@ -29,3 +29,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             organization=validated_data.get('organization')
         )
         return user
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+
+class CookieTokenObtainPairSerializer(TokenObtainPairSerializer):
+    
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['user'] = self.user.user_name
+        data['user_status'] = "active"
+        return data
+
+class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+    pass

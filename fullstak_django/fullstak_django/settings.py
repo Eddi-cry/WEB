@@ -60,10 +60,10 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'users.authentication.CookieJWTAuthentication',
     )
 }
 
@@ -159,27 +159,14 @@ MEDIA_ROOT = '/home/gpsaweb/sampleproject/fullstak_django/media/'
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),         # Сколько живёт access токен
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),            # Сколько живёт refresh токен
-    'ROTATE_REFRESH_TOKENS': True,                          # При использовании refresh — выдать новый refresh
-    'BLACKLIST_AFTER_ROTATION': True,                       # Добавить старый refresh в "чёрный список"
-    'UPDATE_LAST_LOGIN': True,                              # Обновлять last_login при входе
-
-    # Алгоритм подписи
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,                              # Ключ из настроек Django
-    'VERIFYING_KEY': None,
-
-    # Поведение при аутентификации
-    'AUTH_HEADER_TYPES': ('Bearer',),                       # Заголовок: Authorization: Bearer <token>
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',                                  # Поле, которое будет в токене как user_id
-    'USER_ID_CLAIM': 'user_id',
-
-    # Кастомизация токена (можно добавить свои поля)
-    'TOKEN_OBTAIN_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenObtainPairSerializer',
-    'TOKEN_REFRESH_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenRefreshSerializer',
-    'TOKEN_VERIFY_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenVerifySerializer',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 
