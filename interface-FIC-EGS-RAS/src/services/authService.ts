@@ -1,4 +1,15 @@
+// services/authService.ts
 import http from './http';
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  user: string;
+  user_status: string;
+}
 
 export interface RegisterRequest {
   email: string;
@@ -8,89 +19,114 @@ export interface RegisterRequest {
   password2: string;
 }
 
-export interface RegisterResponseUser {
-  email: string;
-  user_name: string;
-  organization: string;
-  start_date: string;
-  is_staff: boolean;
-  is_active: boolean;
-}
-
 export interface RegisterResponse {
   message: string;
-  user: RegisterResponseUser;
+  user: {
+    email: string;
+    user_name: string;
+    organization: string;
+    start_date: string;
+    is_staff: boolean;
+    is_active: boolean;
+  };
 }
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+class AuthService {
+  private isRefreshing = false;
+  private failedQueue: any[] = [];
 
-export interface LoginResponseUser {
-  email: string;
-  user_name: string;
-  organization: string;
-  is_active: boolean;
-  is_staff: boolean;
-}
+  constructor() {
+    this.setupInterceptors();
+  }
 
-export interface LoginResponse {
-  refresh: string;
-  access: string;
-  user: LoginResponseUser;
-}
+  private setupInterceptors() {
+    http.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
 
-function setAccessToken(token: string) {
-  localStorage.setItem('access', token);
-}
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          if (this.isRefreshing) {
+            return new Promise((resolve) => {
+              this.failedQueue.push({ resolve });
+            }).then(() => {
+              return http(originalRequest);
+            });
+          }
 
-function setRefreshCookie(token: string) {
-  const maxAgeSeconds = 60 * 60 * 24 * 7; // 7 days
-  const secure = location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `refresh=${token}; Path=/; SameSite=Strict; Max-Age=${maxAgeSeconds}${secure}`;
-}
+          originalRequest._retry = true;
+          this.isRefreshing = true;
 
-function getRefreshCookie(): string | null {
-  const match = document.cookie.match(/(?:^|; )refresh=([^;]+)/);
-  return match ? decodeURIComponent(match[1]) : null;
-}
+          try {
+            await this.refreshToken();
+            const retryResponse = await http(originalRequest);
+            this.failedQueue.forEach(({ resolve }) => resolve());
+            this.failedQueue = [];
+            return retryResponse;
+          } catch (refreshError) {
+            this.failedQueue.forEach(({ reject }) => reject(refreshError));
+            this.failedQueue = [];
+            this.logout();
+            throw refreshError;
+          } finally {
+            this.isRefreshing = false;
+          }
+        }
 
-function clearAuth() {
-  localStorage.removeItem('access');
-  document.cookie = 'refresh=; Path=/; Max-Age=0';
-}
+        return Promise.reject(error);
+      }
+    );
+  }
 
-async function register(payload: RegisterRequest) {
-  const { data } = await http.post<RegisterResponse>('/api/users/register/', payload);
-  return data;
-}
+  async login(payload: LoginRequest): Promise<LoginResponse> {
+    await this.getCSRF();
+    const { data } = await http.post<LoginResponse>('/api/users/token/', payload);
+    
+    // Сохраняем пользователя в localStorage
+    localStorage.setItem('username', JSON.stringify(data.user));
+    localStorage.setItem('userStatus', JSON.stringify(data.user_status));
+    
+    return data;
+  }
 
-async function login(payload: LoginRequest) {
-  const { data } = await http.post<LoginResponse>('/api/token/', payload);
-  setAccessToken(data.access);
-  setRefreshCookie(data.refresh);
-  return data;
-}
+  async register(payload: RegisterRequest): Promise<RegisterResponse> {
+    await this.getCSRF();
+    const { data } = await http.post<RegisterResponse>('/api/users/register/', payload);
+    return data;
+  }
 
-async function refreshAccessToken(): Promise<string | null> {
-  const refresh = getRefreshCookie();
-  if (!refresh) return null;
-  try {
-    const { data } = await http.post<{ access: string }>('/api/users/refresh/', { refresh });
-    setAccessToken(data.access);
-    return data.access;
-  } catch {
-    clearAuth();
-    return null;
+  async refreshToken(): Promise<void> {
+    await this.getCSRF();
+    await http.post('/api/users/token/refresh/');
+  }
+
+  async getCSRF(): Promise<string> {
+    const response = await http.get('/api/users/csrf/');
+    const csrfToken = response.headers['x-csrftoken'];
+    http.defaults.headers.common['X-CSRFToken'] = csrfToken;
+    return csrfToken;
+  }
+
+  async getProfile() {
+    const { data } = await http.get('/api/users/me/');
+    return data;
+  }
+
+  logout(): void {
+    localStorage.removeItem('username');
+    localStorage.removeItem('userStatus');
+    delete http.defaults.headers.common['X-CSRFToken'];
+    window.location.href = '/Login';
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('username');
+  }
+
+  getCurrentUser(): string | null {
+    const user = localStorage.getItem('username');
+    return user ? JSON.parse(user) : null;
   }
 }
 
-export default {
-  register,
-  login,
-  refreshAccessToken,
-  clearAuth,
-};
-
-
+export default new AuthService();
