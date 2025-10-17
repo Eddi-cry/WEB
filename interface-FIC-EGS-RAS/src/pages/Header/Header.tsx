@@ -6,34 +6,43 @@ import logo767 from '@assets/logo/header-logo-767.svg'
 import logo992 from '@assets/logo/header-logo-992.svg'
 import logo1600 from '@assets/logo/header-logo-1600.svg'
 import LinkOrganization from '@/components/LinkOrganization/LinkOrganization'
+import { useAuth } from '@contexts/AuthContext'
 
 function Header() {
+  const { user, logout, isAuthenticated } = useAuth();
+
+  const handleLogout = () => {
+    if (window.confirm('Вы уверены, что хотите выйти?')) {
+      logout();
+    }
+  };
+
   return (
     <header className='header'>
       <div className='header__container'>
         <div className='header__logo-container'>
           <a className='header__logo-link' href="http://www.gsras.ru">
             <picture className='header__picture'>
-              <source 
-                srcSet={logo320} 
-                media='(max-width: 320px)' 
+              <source
+                srcSet={logo320}
+                media='(max-width: 320px)'
               />
-              <source 
-                srcSet={logo575} 
-                media='(max-width: 575px)' 
+              <source
+                srcSet={logo575}
+                media='(max-width: 575px)'
               />
-              <source 
-                srcSet={logo767} 
-                media='(max-width: 767px)' 
+              <source
+                srcSet={logo767}
+                media='(max-width: 767px)'
               />
-              <source 
-                srcSet={logo992} 
-                media='(max-width: 992px)' 
+              <source
+                srcSet={logo992}
+                media='(max-width: 992px)'
               />
-              <img 
-                src={logo1600} 
-                alt='Федеральный исследовательский центр – Единая геофизическая служба РАН' 
-                className='header__logo' 
+              <img
+                src={logo1600}
+                alt='Федеральный исследовательский центр – Единая геофизическая служба РАН'
+                className='header__logo'
               />
             </picture>
           </a>
@@ -46,9 +55,23 @@ function Header() {
             <Link to='/Access' className='header__link'>Доступ к данным</Link>
           </nav>
           <div className='header__auth'>
-            <Link to='/Login' className='header__auth-link'>Вход</Link>
-            <span className='header__auth-slash'>/</span>
-            <Link to='/Registration' className='header__auth-link'>Регистрация</Link>
+            {isAuthenticated ? (
+              <div className='header__user-info'>
+                <span className='header__username'>Добро пожаловать, {user}!</span>
+                <button 
+                  className='header__logout-btn'
+                  onClick={handleLogout}
+                >
+                  Выйти
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link to='/Login' className='header__auth-link'>Вход</Link>
+                <span className='header__auth-slash'>/</span>
+                <Link to='/Registration' className='header__auth-link'>Регистрация</Link>
+              </>
+            )}
           </div>
         </div>
       </div>

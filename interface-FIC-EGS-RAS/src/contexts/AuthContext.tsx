@@ -1,4 +1,4 @@
-// src/contexts/AuthContextx
+// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import authService from '../services/authService';
 
@@ -25,77 +25,46 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<string | null>(() => 
-    localStorage.getItem('username') 
-      ? JSON.parse(localStorage.getItem('username')!) 
+  const [user, setUser] = useState<string | null>(() =>
+    localStorage.getItem('username')
+      ? JSON.parse(localStorage.getItem('username')!)
       : null
   );
-  const [userStatus, setUserStatus] = useState<string | null>(() => 
-    localStorage.getItem('userStatus') 
-      ? JSON.parse(localStorage.getItem('userStatus')!) 
+  const [userStatus, setUserStatus] = useState<string | null>(() =>
+    localStorage.getItem('userStatus')
+      ? JSON.parse(localStorage.getItem('userStatus')!)
       : null
   );
-
-  // Функция для проверки и обновления токена
-  const refreshToken = async () => {
-    try {
-      await authService.refreshToken();
-      console.log('Token refreshed successfully');
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      logout();
-    }
-  };
 
   // Функция логина
   const login = async (email: string, password: string) => {
     const data = await authService.login({ email, password });
     setUser(data.user);
     setUserStatus(data.user_status);
-    localStorage.setItem('username', JSON.stringify(data.user));
-    localStorage.setItem('userStatus', JSON.stringify(data.user_status));
   };
 
-  // Функция логаута
+  // Функция логаута - УПРОЩЕННАЯ
   const logout = () => {
-    authService.logout();
-    setUser(null);
-    setUserStatus(null);
-    localStorage.removeItem('username');
-    localStorage.removeItem('userStatus');
+    authService.logout(); // Теперь authService полностью обрабатывает выход
   };
 
   // Автоматическое обновление токена
   useEffect(() => {
-    const REFRESH_INTERVAL = 1000 * 60 * 50; // 50 минут (обновляем до истечения 60 минут)
-    
+    const REFRESH_INTERVAL = 1000 * 60 * 50; // 50 минут
+
     let interval: NodeJS.Timeout;
-    
+
     if (user) {
-      // Сразу проверяем при монтировании
-      refreshToken();
-      
       // Устанавливаем периодическое обновление
-      interval = setInterval(refreshToken, REFRESH_INTERVAL);
+      interval = setInterval(() => {
+        authService.refreshToken().catch(() => logout());
+      }, REFRESH_INTERVAL);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [user]);
-
-  // Проверяем авторизацию при загрузке приложения
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (user && !localStorage.getItem('username')) {
-        // Если в состоянии есть пользователь, но в localStorage нет - синхронизируем
-        localStorage.setItem('username', JSON.stringify(user));
-        localStorage.setItem('userStatus', JSON.stringify(userStatus));
-      }
-    };
-    
-    checkAuth();
-  }, []);
 
   const value: AuthContextType = {
     user,

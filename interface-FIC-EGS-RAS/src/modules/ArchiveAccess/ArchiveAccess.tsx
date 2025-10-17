@@ -8,13 +8,14 @@ import ArchiveError from './ArchiveError.tsx'
 import ArchiveDownloadInfo from './ArchiveDownloadInfo.tsx'
 import ArchiveResults from './ArchiveResults.tsx'
 import { ArchiveDownload, ArchiveFilesByStation } from '@/types/types.ts'
-
+import { useAuth } from '@contexts/AuthContext'
 
 function Stations() {
+  const { isAuthenticated } = useAuth();
   const [selectedStations, setSelectedStations] = useState<string[]>([]);
   const allSelected: boolean = selectedStations.length === allStationNames.length;
   const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');   
+  const [endDate, setEndDate] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [results, setResults] = useState<ArchiveFilesByStation | null>(null);
@@ -28,7 +29,7 @@ function Stations() {
         : [...prev, station]
     );
   }
-  
+
   function handleSelectAll() {
     setSelectedStations(allSelected ? [] : allStationNames);
   }
@@ -38,6 +39,11 @@ function Stations() {
   }
 
   async function handleDownload() {
+    if (!isAuthenticated) {
+      setError('Для скачивания архива необходимо войти в систему. Перейдите на страницу входа.');
+      return;
+    }
+
     if (selectedStations.length === 0) {
       setError('Выберите хотя бы одну станцию');
       return;
@@ -65,8 +71,13 @@ function Stations() {
       setDownloadInfo(data);
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
-        const anyErr = error as { response?: { data?: { message?: string } }, message?: string };
-        setError(anyErr.response?.data?.message || anyErr.message || 'Ошибка запроса');
+        const anyErr = error as { response?: { data?: { message?: string }, status?: number }, message?: string };
+        // Обработка 401 ошибки (неавторизован)
+        if (anyErr.response?.status === 401) {
+          setError('Сессия истекла. Пожалуйста, войдите в систему заново.');
+        } else {
+          setError(anyErr.response?.data?.message || anyErr.message || 'Ошибка запроса');
+        }
       } else if (error instanceof Error) {
         setError(error.message);
       } else {
@@ -131,10 +142,10 @@ function Stations() {
               <div className='stations__list-radio'>
                 {
                   allStationNames.map(station => {
-                    return <Checkbox 
-                      key={station} 
-                      checked={selectedStations.includes(station)} 
-                      onChange={() => handleStationChange(station)} 
+                    return <Checkbox
+                      key={station}
+                      checked={selectedStations.includes(station)}
+                      onChange={() => handleStationChange(station)}
                       content={station.toUpperCase()}
                     />
                   })
@@ -167,22 +178,21 @@ function Stations() {
               </div>
             </div>
             <div className='stations__buttons'>
-              {/* <button
-                className='stations__button stations__button__download'
+              <Button
                 onClick={() => handleDownload()}
-                disabled={isDownloading}
-              >
-                {isDownloading ? 'Создание архива...' : 'Скачать данные'}
-              </button> */}
-              <Button 
-                onClick={() => handleDownload()}
-                aim='stations__download'
-                disabled={isDownloading}
-                content={isDownloading ? 'Создание архива............' : 'Скачать архив'}
+                aim={!isAuthenticated ? 'stations__download-btn--disabled' : 'stations__download'}
+                disabled={isDownloading || !isAuthenticated}
+                content={
+                  !isAuthenticated 
+                    ? 'Скачать архив (требуется вход)' 
+                    : isDownloading 
+                      ? 'Создание архива...' 
+                      : 'Скачать архив'
+                }
               />
-              <Button 
-                type="submit" 
-                aim="stations" 
+              <Button
+                type="submit"
+                aim="stations"
                 disabled={isLoading}
                 content={isLoading ? 'Загрузка...' : 'Посмотреть данные'}
               />

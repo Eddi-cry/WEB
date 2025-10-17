@@ -81,11 +81,11 @@ class AuthService {
   async login(payload: LoginRequest): Promise<LoginResponse> {
     await this.getCSRF();
     const { data } = await http.post<LoginResponse>('/api/users/token/', payload);
-    
+
     // Сохраняем пользователя в localStorage
     localStorage.setItem('username', JSON.stringify(data.user));
     localStorage.setItem('userStatus', JSON.stringify(data.user_status));
-    
+
     return data;
   }
 
@@ -113,10 +113,39 @@ class AuthService {
   }
 
   logout(): void {
+    // 1. Очищаем localStorage
     localStorage.removeItem('username');
     localStorage.removeItem('userStatus');
+    
+    // 2. Очищаем cookies с JWT токенами
+    this.clearAuthCookies();
+    
+    // 3. Очищаем CSRF токен
     delete http.defaults.headers.common['X-CSRFToken'];
+    
+    // 4. Перенаправляем на страницу логина
     window.location.href = '/Login';
+  }
+
+  // НОВЫЙ МЕТОД: Очистка auth cookies
+  private clearAuthCookies(): void {
+    const cookies = document.cookie.split(';');
+    
+    for (let cookie of cookies) {
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      
+      // Удаляем все auth-related cookies
+      if (name === 'access_token' || name === 'refresh_token' || name === 'csrftoken') {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=172.20.1.244;`;
+      }
+    }
+    
+    // Дополнительная очистка на всякий случай
+    document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'csrftoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   }
 
   isAuthenticated(): boolean {

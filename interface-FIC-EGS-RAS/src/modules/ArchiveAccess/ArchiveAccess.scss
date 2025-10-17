@@ -115,3 +115,14 @@
         }
     }
 }
+
+.stations__download-btn--disabled {
+  background-color: #ccc !important;
+  color: #666 !important;
+  cursor: not-allowed !important;
+
+  &:hover {
+    background-color: #ccc !important;
+    transform: none !important;
+  }
+}
