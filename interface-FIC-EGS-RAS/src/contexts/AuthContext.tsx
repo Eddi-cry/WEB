@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import authService from '../services/authService';
 
@@ -45,7 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Функция логаута - УПРОЩЕННАЯ
   const logout = () => {
-    authService.logout(); // Теперь authService полностью обрабатывает выход
+    authService.logout();
   };
 
   // Автоматическое обновление токена
