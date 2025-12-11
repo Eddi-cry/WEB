@@ -25,6 +25,11 @@ class StationFilesView(APIView):
         stations = request.data.get('stations', [])
         start_date_str = request.data.get('startDate')
         end_date_str = request.data.get('endDate')
+        single_date_str = request.data.get('singleDate')
+
+        if single_date_str:
+            start_date_str = single_date_str
+            end_date_str = single_date_str
 
         if not stations:
             return Response(
@@ -98,6 +103,11 @@ class DownloadArchiveView(APIView):
         stations = request.data.get('stations', [])
         start_date_str = request.data.get('startDate')
         end_date_str = request.data.get('endDate')
+        single_date_str = request.data.get('singleDate')
+
+        if single_date_str:
+            start_date_str = single_date_str
+            end_date_str = single_date_str
 
         if not stations:
             return Response({"error": "Не выбраны станции"}, status=status.HTTP_400_BAD_REQUEST)
