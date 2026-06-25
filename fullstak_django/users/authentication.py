@@ -6,7 +6,7 @@ from .utils import enforce_csrf
 
 class CookieJWTAuthentication(JWTAuthentication):
     
-    @method_decorator(enforce_csrf)
+   # @method_decorator(enforce_csrf)
     def authenticate(self, request):
         header = self.get_header(request)
         

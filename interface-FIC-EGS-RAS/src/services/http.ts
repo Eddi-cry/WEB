@@ -10,37 +10,32 @@ export const http: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-// Функция для получения CSRF токена из cookies
-function getCSRFTokenFromCookie(): string | null {
-  const name = 'csrftoken=';
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const ca = decodedCookie.split(';');
-  
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i].trim();
-    if (c.indexOf(name) === 0) {
-      return c.substring(name.length);
-    }
-  }
-  return null;
-}
+// Храним CSRF токен в памяти
+let csrfToken: string | null = null;
 
-// Interceptor для автоматической установки CSRF токена
+// Интерцептор для сохранения CSRF токена из ответа
+http.interceptors.response.use(
+  (response) => {
+    const token = response.headers['x-csrftoken'];
+    if (token) {
+      csrfToken = token;
+      console.log('CSRF Token saved:', csrfToken);
+    }
+    return response;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Интерцептор для добавления CSRF токена в запросы
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Для ВСЕХ запросов (включая GET) получаем CSRF токен
-    const csrfToken = getCSRFTokenFromCookie();
-    
     if (csrfToken && config.headers) {
       config.headers['X-CSRFToken'] = csrfToken;
-      config.headers['X-CSRF-Token'] = csrfToken; // Дублируем на всякий случай
+      console.log('Added CSRF token to request:', csrfToken);
     }
-    
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default http;

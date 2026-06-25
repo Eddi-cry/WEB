@@ -86,7 +86,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
     authentication_classes = ()
     permission_classes = (AllowAny,)
 
-    @method_decorator(enforce_csrf)
+    # @method_decorator(enforce_csrf)
     def post(self, request: Request, *args, **kwargs) -> Response:
         response = super().post(request, *args, **kwargs)
 
@@ -96,9 +96,9 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
             if access_token and refresh_token:
                 response = set_jwt_cookies(response, access_token, refresh_token)
-                
-                # Оставляем user данные в ответе
                 response.data = {
+                    'access': access_token,  # ← ДОБАВИТЬ
+                    'refresh': refresh_token,  # ← ДОБАВИТЬ
                     'user': response.data.get('user'),
                     'user_status': response.data.get('user_status')
                 }

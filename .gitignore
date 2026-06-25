@@ -43,3 +43,4 @@ logs/
 interface-FIC-EGS-RAS/dist/
 interface-FIC-EGS-RAS/vite
 interface-FIC-EGS-RAS/web-geophysic@0.0.0
+.env

@@ -1,10 +1,11 @@
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.permissions import AllowAny
 from datetime import datetime
 import os
 import tarfile
@@ -90,12 +91,13 @@ class StationFilesView(APIView):
 SSH_HOST = "172.20.1.177"
 SSH_PORT = 22
 SSH_USERNAME = "volichevm"
-SSH_PASSWORD = "DVnm34_E$T"
+SSH_PASSWORD = os.environ.get('SSH_PASSWORD')
 
 # Путь к данным на удалённом сервере
 REMOTE_BASE_PATH = "/home/volichevm/"
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DownloadArchiveView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -196,7 +198,7 @@ class DownloadArchiveView(APIView):
                 # ✅ Возвращаем только JSON, без Content-Disposition
                 return Response({
                     'success': True,
-                    'download_url': request.build_absolute_uri(f"/media/{tar_filename}"),
+                    'download_url': request.build_absolute_uri(f"http://172.20.1.244:8080/media/{tar_filename}"),
                     'file_count': file_count,
                     'archive_name': tar_filename,
                     'stations': stations,
