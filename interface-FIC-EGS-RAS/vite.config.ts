@@ -1,25 +1,25 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@components': resolve(__dirname, './src/components'),
-      '@pages': resolve(__dirname, './src/pages'),
-      '@services': resolve(__dirname, './src/services'),
-      '@contexts': resolve(__dirname, './src/contexts'),
-      '@types': resolve(__dirname, './src/types'),
-      '@constants': resolve(__dirname, './src/constants'),
-      '@assets': resolve(__dirname, './src/assets'),
-      '@styles': resolve(__dirname, './src/styles'),
-      '@modules': resolve(__dirname, './src/modules'),
-    }
+      '@': path.resolve(__dirname, './src'),
+      '@assets': path.resolve(__dirname, './src/assets'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@constants': path.resolve(__dirname, './src/constants'),
+      '@context': path.resolve(__dirname, './src/context'),
+      '@modules': path.resolve(__dirname, './src/modules'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@services': path.resolve(__dirname, './src/services'),
+      '@styles': path.resolve(__dirname, './src/styles'),
+      '@types': path.resolve(__dirname, './src/types'),
+    },
   },
-  server: {
-    host: '0.0.0.0',
-    port: 5173,
-  },
-})
+});

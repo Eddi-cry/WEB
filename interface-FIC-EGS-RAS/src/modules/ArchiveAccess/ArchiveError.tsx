@@ -1,4 +1,4 @@
-import './ArchiveAccess.scss'
+import './ArchiveAccess.scss';
 
 function ArchiveError({ error }: { error: string }) {
   return (

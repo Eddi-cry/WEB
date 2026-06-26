@@ -1,6 +1,6 @@
 // import axios from "axios"
-import { IGSStation } from "../types/types"
-import igsNetwork from "@constants/IGSNetwork.json"
+import { IGSStation } from '../types/types';
+import igsNetwork from '@constants/IGSNetwork.json';
 
 export const getDataIGS = (): Record<string, IGSStation> => {
   try {

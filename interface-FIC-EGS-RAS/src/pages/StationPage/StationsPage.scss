@@ -1,0 +1,91 @@
+@use '@styles/variables.scss';
+@use '@styles/mixins.scss';
+
+.stations-page {
+  &__container {
+    padding: 29px 29px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 2vh;
+    max-width: 95vw;
+  }
+
+  &__title {
+    font-weight: variables.$font-weight-bold;
+    font-size: variables.$font-size-ml;
+  }
+
+  &__lists {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2vw;
+  }
+
+  &__list {
+    background-color: variables.$white-color;
+    border-radius: variables.$radius-s;
+    box-shadow: variables.$box-shadow-main;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1vh;
+  }
+
+  &__subtitle {
+    font-size: variables.$font-size-s;
+    font-weight: variables.$font-weight-medium;
+    margin-bottom: 1vh;
+  }
+
+  &__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5vh;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 1vw;
+    padding: 6px 10px;
+    border-radius: variables.$radius-s;
+    cursor: pointer;
+    transition:
+      background-color variables.$transition-fast ease,
+      transform variables.$transition-fast ease;
+
+    &:hover {
+      background-color: variables.$light-gray;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &__item-name {
+    font-size: variables.$font-size-xs;
+    font-weight: variables.$font-weight-medium;
+  }
+
+  &__item-region {
+    font-size: variables.$font-size-xxs;
+    color: variables.$second-color;
+    text-align: right;
+  }
+
+  @media screen and (max-width: 767px) {
+    &__title {
+      font-size: variables.$font-size-s;
+    }
+
+    &__lists {
+      grid-template-columns: 1fr;
+    }
+  }
+}

@@ -1,35 +1,35 @@
-@use "@styles/variables";
-@use "@styles/mixins";
+@use '@styles/variables.scss';
 
 .cards__station {
-    &__slider {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  &__slider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    &__button {
-        margin: 0 2vh;
-        transition: variables.$transition-fast transform;
+  &__button {
+    margin: 0 2vh;
+    transition: variables.$transition-fast transform;
+    cursor: pointer;
 
-        &:active {
-            transform: scale(0.9);
-        }
+    &:active {
+      transform: scale(0.9);
     }
+  }
 
-    &__counter {
-        text-align: center;
-        margin-top: 5px;
-        font-size: variables.$font-size-xs;
-        color: variables.$black-color;
-    }
+  &__counter {
+    text-align: center;
+    margin-top: 5px;
+    font-size: variables.$font-size-xs;
+    color: variables.$black-color;
+  }
 
-    &__photo {
-        padding-top: 2vh;
-    }
+  &__photo {
+    padding-top: 2vh;
+  }
 
-    &--warning {
-        font-size: variables.$font-size-xs;
-        color: variables.$second-color;
-    }
+  &--warning {
+    font-size: variables.$font-size-xs;
+    color: variables.$second-color;
+  }
 }

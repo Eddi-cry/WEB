@@ -1,14 +1,14 @@
-// IGS Station Data Types (оставь как есть)
-export interface IGSReceiver {
+// IGS Station Data Types
+export type IGSReceiver = {
   Name?: string;
   SatelliteSystem?: string;
   SerialNumber?: string;
   FirmwareVersion?: string;
   ElevCutoff?: string;
   DateInstalled?: string;
-}
+};
 
-export interface IGSAntenna {
+export type IGSAntenna = {
   Name?: string;
   Radome?: string;
   SerialNumber?: string;
@@ -17,15 +17,15 @@ export interface IGSAntenna {
   MarkerNorth?: string;
   MarkerEast?: string;
   DateInstalled?: string;
-}
+};
 
-export interface IGSClock {
+export type IGSClock = {
   Type?: string;
   InputFrequency?: string;
   EffectiveDates?: string;
-}
+};
 
-export interface IGSStation {
+export type IGSStation = {
   X?: number;
   Y?: number;
   Z?: number;
@@ -35,10 +35,10 @@ export interface IGSStation {
   Receiver?: IGSReceiver;
   Antenna?: IGSAntenna;
   Clock?: IGSClock;
-}
+};
 
 // Archive Access Types
-export interface ArchiveDownload {
+export type ArchiveDownload = {
   success: boolean;
   download_url?: string;
   file_count: number;
@@ -46,9 +46,9 @@ export interface ArchiveDownload {
   stations: string[];
   period: string;
   structure: string;
-}
+};
 
-export interface ArchiveFile {
+export type ArchiveFile = {
   id: string;
   filename: string;
   date: string;
@@ -58,13 +58,12 @@ export interface ArchiveFile {
     staid: number;
     staname: string;
   };
-}
-
-export interface ArchiveError {
-  error: string;
-}
-
-// ✅ Новый тип: результат поиска файлов
-export type ArchiveFilesByStation = {
-  [station: string]: ArchiveFile[];
 };
+
+export type ArchiveError = {
+  error: string;
+};
+
+export type ArchiveFiles = Record<string, ArchiveFile[] | ArchiveError>;
+
+export type ArchiveFilesByStation = Record<string, ArchiveFile[]>;

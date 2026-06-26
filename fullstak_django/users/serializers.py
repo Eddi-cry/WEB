@@ -4,7 +4,9 @@ from .models import NewUser
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewUser
-        fields = ('email', 'user_name', 'organization', 'start_date', 'is_staff', 'is_active')
+        fields = ('email', 'user_name', 'last_name', 'first_name', 'patronymic',
+                  'phone', 'organization', 'department', 'position',
+                  'start_date', 'is_staff', 'is_active')
         read_only_fields = ('start_date', 'is_staff')
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -13,7 +15,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NewUser
-        fields = ('email', 'user_name', 'organization', 'password', 'password2')
+        fields = ('email', 'user_name', 'organization', 'password', 'password2',
+                  'last_name', 'first_name', 'patronymic', 'phone', 'department', 'position')
+        # extra_kwargs больше не нужны
 
     def validate(self, data):
         if data['password'] != data['password2']:
@@ -22,13 +26,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password2')
-        user = NewUser.objects.create_user(
-            email=validated_data['email'],
-            user_name=validated_data['user_name'],
-            password=validated_data['password'],
-            organization=validated_data.get('organization')
-        )
-        return user
+        return NewUser.objects.create_user(**validated_data)
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 

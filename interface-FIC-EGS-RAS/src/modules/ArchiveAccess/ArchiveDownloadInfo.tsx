@@ -1,5 +1,5 @@
-import './ArchiveAccess.scss'
-import { ArchiveDownload } from '@/types/types.ts'
+import './ArchiveAccess.scss';
+import { ArchiveDownload } from '@/types/types.ts';
 
 function ArchiveDownloadInfo(downloadInfo: ArchiveDownload) {
   return (
@@ -9,8 +9,8 @@ function ArchiveDownloadInfo(downloadInfo: ArchiveDownload) {
       <p className='stations__description'>Количество файлов: {downloadInfo.file_count}</p>
       <p className='stations__description'>Структура архива: {downloadInfo.structure}</p>
       {downloadInfo.download_url && (
-        <a 
-          href={downloadInfo.download_url} 
+        <a
+          href={downloadInfo.download_url}
           target='_blank'
           rel='noopener noreferrer'
           className='download-link'
@@ -20,6 +20,6 @@ function ArchiveDownloadInfo(downloadInfo: ArchiveDownload) {
       )}
     </div>
   );
-};
+}
 
 export default ArchiveDownloadInfo;

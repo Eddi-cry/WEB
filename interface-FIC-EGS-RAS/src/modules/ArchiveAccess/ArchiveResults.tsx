@@ -2,22 +2,18 @@ import './ArchiveAccess.scss';
 import { ArchiveFilesByStation } from '@/types/types.ts';
 
 function ArchiveResults({ results }: { results: ArchiveFilesByStation }) {
-  console.log('ArchiveResults rendered with:', results);
-  // Преобразуем объект в массив строк
   const rows = Object.entries(results).flatMap(([station, files]) =>
-    files.map(file => ({
+    files.map((file) => ({
       station,
       ...file,
     }))
   );
 
-  console.log('Rows to render:', rows);
-
   return (
-    <div className="stations__results">
+    <div className='stations__results'>
       <h3>Найденные данные:</h3>
 
-      <table className="results-table">
+      <table className='results-table'>
         <thead>
           <tr>
             <th>Станция</th>
@@ -34,13 +30,13 @@ function ArchiveResults({ results }: { results: ArchiveFilesByStation }) {
                 <td>{file.station.toUpperCase()}</td>
                 <td>{file.date}</td>
                 <td>{file.filename}</td>
-                <td className="path-cell">{file.path}</td>
+                <td className='path-cell'>{file.path}</td>
                 <td>{file.fullness}%</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="no-data">
+              <td colSpan={5} className='no-data'>
                 Нет данных за выбранный период
               </td>
             </tr>

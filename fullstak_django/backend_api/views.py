@@ -17,7 +17,7 @@ from .serializer import FileSerializer, StationSerializer
 
 import paramiko
 import traceback
-
+from rest_framework.permissions import IsAuthenticated
 
 class StationFilesView(APIView):
     permission_classes = [AllowAny]

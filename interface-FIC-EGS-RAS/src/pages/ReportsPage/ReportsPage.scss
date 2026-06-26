@@ -1,0 +1,60 @@
+@use '@styles/variables.scss';
+@use '@styles/mixins.scss';
+
+.reports-page {
+  &__container {
+    padding: 29px 29px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 3vh;
+    max-width: 95vw;
+  }
+
+  &__title {
+    font-weight: variables.$font-weight-bold;
+    font-size: variables.$font-size-ml;
+  }
+
+  &__select-container {
+    display: flex;
+    column-gap: 1vw;
+    align-self: center;
+  }
+
+  &__select {
+    width: 15vw;
+    min-width: 150px;
+  }
+
+  &__download {
+    color: #000;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+
+  &__viewer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__viewer {
+    border-radius: variables.$radius-s;
+    border: 1px solid variables.$second-color;
+  }
+
+  @media screen and (max-width: 767px) {
+    & {
+      &__title {
+        font-size: variables.$font-size-s;
+      }
+    }
+
+    &__viewer {
+      width: 90%;
+    }
+  }
+}

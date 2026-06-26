@@ -1,0 +1,50 @@
+@use '@styles/variables.scss';
+@use '@styles/mixins.scss';
+
+.station-page {
+  &__container {
+    padding: 29px 29px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 2vh;
+    max-width: 95vw;
+  }
+
+  &__back-button {
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: variables.$radius-s;
+    border: 1px solid variables.$second-color;
+    background-color: variables.$white-color;
+    font-size: variables.$font-size-xxs;
+    cursor: pointer;
+    transition:
+      background-color variables.$transition-fast ease,
+      transform variables.$transition-fast ease;
+
+    &:hover {
+      background-color: variables.$light-gray;
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+
+  &__title {
+    font-weight: variables.$font-weight-bold;
+    font-size: variables.$font-size-ml;
+  }
+
+  @media screen and (max-width: 767px) {
+    & {
+      &__title {
+        font-size: variables.$font-size-s;
+      }
+    }
+
+    &__viewer {
+      width: 90%;
+    }
+  }
+}

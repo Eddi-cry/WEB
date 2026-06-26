@@ -1,4 +1,4 @@
-import ArchiveAccess from '@modules/ArchiveAccess/ArchiveAccess.tsx'
+import ArchiveAccess from '@modules/ArchiveAccess/ArchiveAccess.tsx';
 
 function AccessPage() {
   return (

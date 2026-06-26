@@ -1,0 +1,42 @@
+@use '@styles/variables.scss';
+@use '@styles/mixins.scss';
+
+.station-page {
+  &__left-container {
+    margin: 10px 0;
+    display: flex;
+    column-gap: 2vw;
+  }
+
+  &__map {
+    &-container {
+      height: auto;
+      width: 50%;
+
+      // Убираем стрелку (треугольник) у попапа Leaflet
+      .leaflet-popup-tip {
+        display: none;
+      }
+    }
+
+    &-popup {
+      display: flex;
+      justify-content: column;
+    }
+  }
+
+  &__left-table {
+    width: auto;
+    border-collapse: collapse;
+
+    tr {
+      border: 1px solid variables.$black-color;
+    }
+
+    td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid variables.$black-color;
+    }
+  }
+}

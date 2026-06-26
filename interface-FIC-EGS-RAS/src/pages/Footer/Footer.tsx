@@ -1,14 +1,12 @@
-import './Footer.scss'
-import LinkOrganization from '@/components/LinkOrganization/LinkOrganization'
+import './Footer.scss';
+import LinkOrganization from '@/components/LinkOrganization/LinkOrganization.tsx';
 
 function Footer() {
-  return(
+  return (
     <footer className='footer'>
       <div className='footer__container'>
-        <LinkOrganization classNamePart='footer'/>
-        <p className="footer__copyright">
-          © ФИЦ ЕГС РАН 1993-2025
-        </p>
+        <LinkOrganization classNamePart='footer' />
+        <p className='footer__copyright'>© ФИЦ ЕГС РАН 1993-2026</p>
       </div>
     </footer>
   );

@@ -1,13 +1,16 @@
-import { IGSStation } from '../types/types'
+import { IGSStation } from '../types/types';
 
-export interface Station extends IGSStation {
+export type Station = IGSStation & {
   Name: string;
+  LongName: string;
   Region: string;
+  Status: string;
+  Period: string;
 };
 
 export const position: [number, number] = [68.524, 105.3188];
 
-export const allStationNames: string[] = [
+export const activeStationsNames: string[] = [
   'arti',
   'artu',
   'bilb',
@@ -32,19 +35,205 @@ export const allStationNames: string[] = [
   'yssk',
 ];
 
+export const caucasusStationsNames: string[] = [
+  'vlkz',
+  'latz',
+  'laz2',
+  'prtn',
+  'ardn',
+  'ard2',
+  'kamt',
+];
+
 export const activeStations: Array<Station> = [
-  { Name: 'artu', Region: 'Арти, Россия' },
-  { Name: 'arti', Region: 'Арти, Россия', Latitude: '56.430', Longitude: '58.560' },
-  { Name: 'irkm', Region: 'Иркутск, Россия' },
-  { Name: 'irkt', Region: 'Иркутск, Россия', Latitude: '52.219', Longitude: '104.316' },
-  { Name: 'mag0', Region: 'Магадан, Россия' },
-  { Name: 'mobn', Region: 'Обнинск, Россия' },
-  { Name: 'mobk', Region: 'Обнинск, Россия' },
-  { Name: 'mobj', Region: 'Обнинск, Россия' },
-  { Name: 'nril', Region: 'Норильск, Россия' },
-  { Name: 'pets', Region: 'Петропавловск-Камчатский, Россия' },
-  { Name: 'tixi', Region: 'Тикси, Россия' },
-  { Name: 'tixj', Region: 'Тикси, Россия', Latitude: '71.634', Longitude: '128.866' },
-  { Name: 'yakt', Region: 'Якутск, Россия' },
-  { Name: 'yssk', Region: 'Южно-Сахалинск, Россия' },
+  {
+    Name: 'artu',
+    LongName: 'gps station Arti IGS',
+    Region: 'Арти, Свердловская область, Россия',
+    Status: 'Функционирует',
+    Period: '05.08.1999 - н.в.',
+    Latitude: '56.430',
+    Longitude: '58.560',
+  },
+  {
+    Name: 'arti',
+    LongName: 'gps station Volkovo',
+    Region: 'Арти, Свердловская область, Россия',
+    Status: 'Функционирует',
+    Period: '21.11.2021 - н.в.',
+    Latitude: '56.430',
+    Longitude: '58.560',
+  },
+  {
+    Name: 'irkm',
+    LongName: 'gps station Irkutsk IGS',
+    Region: 'Иркутск, Иркутская область, Россия',
+    Status: 'Функционирует',
+    Period: '17.11.2004 - н.в.',
+    Latitude: '52.219',
+    Longitude: '104.316',
+  },
+  {
+    Name: 'irkt',
+    LongName: 'gps station Irkutsk',
+    Region: 'Иркутск, Иркутская область, Россия',
+    Status: 'Функционирует',
+    Period: '16.09.1995 - н.в.',
+    Latitude: '52.219',
+    Longitude: '104.316',
+  },
+  {
+    Name: 'mag0',
+    LongName: 'gps station Magadan IGS',
+    Region: 'Магадан, Магаданская область, Россия',
+    Status: 'Функционирует',
+    Period: '12.11.1997 - н.в.',
+    Latitude: '54.800',
+    Longitude: '59.450',
+  },
+  {
+    Name: 'mobn',
+    LongName: 'gps station Obninsk',
+    Region: 'Обнинск, Калужская область, Россия',
+    Status: 'Функционирует',
+    Period: '18.12.2000 - н.в.',
+    Latitude: '55.400',
+    Longitude: '52.800',
+  },
+  {
+    Name: 'mobk',
+    LongName: 'gps station Obninsk',
+    Region: 'Обнинск, Калужская область, Россия',
+    Status: 'Функционирует',
+    Period: '21.12.2009 - н.в.',
+    Latitude: '55.400',
+    Longitude: '52.800',
+  },
+  {
+    Name: 'mobj',
+    LongName: 'gps station Obninsk IGS',
+    Region: 'Обнинск, Калужская область, Россия',
+    Status: 'Функционирует',
+    Period: '15.12.2005 - н.в.',
+    Latitude: '55.400',
+    Longitude: '52.800',
+  },
+  {
+    Name: 'nril',
+    LongName: 'gps station Norilsk IGS',
+    Region: 'Норильск, Краснодарский край, Россия',
+    Status: 'Функционирует',
+    Period: '17.09.2000 - н.в.',
+    Latitude: '69.350',
+    Longitude: '88.200',
+  },
+  {
+    Name: 'pets',
+    LongName: 'gps station Petropavlovsk IGS',
+    Region: 'Петропавловск-Камчатский, Камчатский край, Россия',
+    Status: 'Функционирует',
+    Period: '02.09.2002 - н.в.',
+  },
+  {
+    Name: 'tixi',
+    LongName: 'gps station Tixi IGS',
+    Region: 'Тикси, Руспублика Саха, Россия',
+    Status: 'Функционирует',
+    Period: '08.10.1998 - н.в.',
+    Latitude: '71.634',
+    Longitude: '128.866',
+  },
+  {
+    Name: 'tixj',
+    LongName: 'gps station Tixi',
+    Region: 'Тикси, Руспублика Саха, Россия',
+    Status: 'Функционирует',
+    Period: '24.12.2005 - н.в.',
+    Latitude: '71.634',
+    Longitude: '128.866',
+  },
+  {
+    Name: 'yakt',
+    LongName: 'gps station Yakutsk IGS',
+    Region: 'Якутск, Республика Саха, Россия',
+    Status: 'Функционирует',
+    Period: '24.04.2000 - н.в.',
+    Latitude: '56.600',
+    Longitude: '92.000',
+  },
+  {
+    Name: 'yssk',
+    LongName: 'gps station Yuzhno-Sakhalins IGS',
+    Region: 'Южно-Сахалинск, Сахалинская область, Россия',
+    Status: 'Функционирует',
+    Period: '28.07.1999 - н.в.',
+    Latitude: '46.600',
+    Longitude: '142.000',
+  },
+];
+
+export const caucasusStations: Array<Station> = [
+  {
+    Name: 'vlkz',
+    LongName: '',
+    Region: 'Владикавказ, Республика Северная Осетия - Алания, Россия',
+    Status: '',
+    Period: '',
+    Latitude: '43.050',
+    Longitude: '44.680',
+  },
+  {
+    Name: 'latz',
+    LongName: '',
+    Region: 'Лац, Республика Северная Осетия - Алания, Россия',
+    Status: '',
+    Period: '',
+    Latitude: '42.833',
+    Longitude: '44.300',
+  },
+  {
+    Name: 'laz2',
+    LongName: '',
+    Region: 'Лац, Республика Северная Осетия - Алания, Россия',
+    Status: '',
+    Period: '',
+    Latitude: '42.833',
+    Longitude: '44.300',
+  },
+  {
+    Name: 'prtn',
+    LongName: '',
+    Region: 'Притеречный, Республика Северная Осетия - Алания, Россия',
+    Status: '',
+    Period: '',
+    Latitude: '43.750',
+    Longitude: '44.283',
+  },
+  {
+    Name: 'ardn',
+    LongName: '',
+    Region: 'Ардон, Республика Северная Осетия - Алания, Россия',
+    Status: '',
+    Period: '',
+    Latitude: '43.167',
+    Longitude: '44.283',
+  },
+  {
+    Name: 'ard2',
+    LongName: '',
+    Region: 'Ардон, Республика Северная Осетия - Алания, Россия',
+    Status: '',
+    Period: '',
+    Latitude: '43.167',
+    Longitude: '44.283',
+  },
+  {
+    Name: 'kamt',
+    LongName: '',
+    Region: 'Камата, Республика Северная Осетия - Алания, Россия',
+    Status: '',
+    Period: '',
+    Latitude: '42.950',
+    Longitude: '43.783',
+  },
 ];

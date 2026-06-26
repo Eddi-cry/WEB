@@ -5,45 +5,86 @@ from django.contrib.auth.models import Group
 from .models import NewUser
 
 
-# Настройка отображения в списке
 class NewUserAdmin(UserAdmin):
-    # Поля, которые будут отображаться в списке пользователей
-    list_display = ('email', 'user_name', 'organization', 'is_active', 'is_staff', 'start_date')
-    
-    # Поля, по которым можно кликать для перехода в редактирование
-    list_display_links = ('email', 'user_name')
-    
-    # Поля для фильтрации (справа)
-    list_filter = ('is_staff', 'is_active', 'start_date')
-    
-    # Поля, по которым можно искать
-    search_fields = ('email', 'user_name', 'organization')
+    # Поля, отображаемые в списке пользователей
+    list_display = (
+        'email',
+        'user_name',
+        'last_name',
+        'first_name',
+        'phone',
+        'department',
+        'organization',
+        'is_active',
+        'is_staff',
+        'start_date'
+    )
 
-    #Поля, по которые можно ихменить
+    # Ссылки для перехода в редактирование
+    list_display_links = ('email', 'user_name')
+
+    # Фильтры (справа)
+    list_filter = ('is_staff', 'is_active', 'start_date', 'department')
+
+    # Поля для поиска
+    search_fields = (
+        'email',
+        'user_name',
+        'last_name',
+        'first_name',
+        'patronymic',
+        'phone',
+        'organization',
+        'department',
+        'position'
+    )
+
+    # Редактируемые прямо из списка (быстрое изменение)
     list_editable = ('is_active', 'is_staff')
-    
-    # Поля, которые будут отображаться при редактировании
+
+    # Поля и группы при редактировании пользователя
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('user_name', 'organization')}),
+        ('Personal Info', {
+            'fields': (
+                'user_name',
+                'last_name',
+                'first_name',
+                'patronymic',
+                'phone',
+                'organization',
+                'department',
+                'position'
+            )
+        }),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
         ('Important dates', {'fields': ('start_date', 'last_login')}),
     )
-    
-    # Поля при создании нового пользователя
+
+    # Поля при создании нового пользователя (через админку)
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'user_name', 'organization', 'password1', 'password2', 'is_active', 'is_staff'),
+            'fields': (
+                'email',
+                'user_name',
+                'last_name',
+                'first_name',
+                'patronymic',
+                'phone',
+                'organization',
+                'department',
+                'position',
+                'password1',
+                'password2',
+                'is_active',
+                'is_staff'
+            ),
         }),
     )
-    
-    # Сортировка по умолчанию
+
     ordering = ('email',)
 
 
-# Зарегистрируй модель
 admin.site.register(NewUser, NewUserAdmin)
-
-# (Опционально) Убери стандартную группу из админки, если не нужна
-admin.site.unregister(Group)
+admin.site.unregister(Group)  # убираем стандартную группу, если не нужна

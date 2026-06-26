@@ -16,12 +16,18 @@ class CustomAccountManager(BaseUserManager):
 
         return self.create_user(email, user_name, password, **other_fields)
 
-    def create_user(self, email, user_name, password, **other_fields):
-        if not email:
-            raise ValueError('You must provide an email address')
 
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('Email обязателен')
         email = self.normalize_email(email)
-        user = self.model(email=email, user_name=user_name, **other_fields)
+        user = self.model(email=email, **extra_fields)
+        # Если user_name не передан, формируем его из имени и отчества или используем email
+        if not user.user_name:
+            if user.first_name and user.patronymic:
+                user.user_name = f"{user.first_name} {user.patronymic}"
+            else:
+                user.user_name = email
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -29,18 +35,27 @@ class CustomAccountManager(BaseUserManager):
 
 class NewUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('email address', unique=True)
-    user_name = models.CharField(max_length=150, unique=True)
-    organization = models.CharField(max_length=200, blank=True, null=True)  # NULL в БД
-    start_date = models.DateTimeField(default=timezone.now, null=False)  # NOT NULL
+    user_name = models.CharField(max_length=150, blank=True)  # убрали unique=True, добавили blank=True
+    # Новые поля
+    last_name = models.CharField(max_length=150, blank=True, verbose_name='Фамилия')
+    first_name = models.CharField(max_length=150, blank=True, verbose_name='Имя')
+    patronymic = models.CharField(max_length=150, blank=True, verbose_name='Отчество')
+    phone = models.CharField(max_length=20, blank=True, verbose_name='Телефон')
+    organization = models.CharField(max_length=200, blank=True, null=True)
+    department = models.CharField(max_length=200, blank=True, verbose_name='Подразделение')
+    position = models.CharField(max_length=200, blank=True, verbose_name='Должность')
+    # Остальные поля оставляем
+    start_date = models.DateTimeField(default=timezone.now, null=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    # is_superuser — уже есть из PermissionsMixin
-    # last_login — уже есть в AbstractBaseUser
 
     objects = CustomAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['user_name']  # больше нет first_name
+    REQUIRED_FIELDS = []  # теперь user_name не обязателен
 
     def __str__(self):
-        return self.user_name
+        # Возвращаем ФИО или email, если ФИО нет
+        if self.last_name or self.first_name or self.patronymic:
+            return f"{self.last_name} {self.first_name} {self.patronymic}".strip()
+        return self.email
