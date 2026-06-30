@@ -59,6 +59,21 @@
     }
   }
 
+  &__date-mode {
+    display: flex;
+    justify-content: center;
+    column-gap: 24px;
+    margin-bottom: 12px;
+
+    &-option {
+      display: flex;
+      align-items: center;
+      column-gap: 6px;
+      font-size: variables.$font-size-s;
+      cursor: pointer;
+    }
+  }
+
   &__list {
     display: flex;
     flex-direction: column;

@@ -1,8 +1,10 @@
 import './Login.scss';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '@components/Button/Button.tsx';
 import authService from '@services/authService.ts';
+import { useAuth } from '@context/AuthContext.tsx';
 
 interface LoginProps {
   email: string;
@@ -12,12 +14,18 @@ interface LoginProps {
 function Login() {
   const { register, handleSubmit, formState } = useForm<LoginProps>();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/Access';
 
   const onSubmit = async (data: LoginProps) => {
     setSubmitError(null);
 
     try {
-      await authService.login({ email: data.email, password: data.password });
+      const response = await authService.login({ email: data.email, password: data.password });
+      setUser(response.user);
+      navigate(from, { replace: true });
     } catch {
       setSubmitError('Неверная почта или пароль');
     }

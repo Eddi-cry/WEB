@@ -9,6 +9,7 @@ import StationsPage from '@pages/StationPage/StationsPage.tsx';
 import Login from '@pages/Authorization/Login/Login.tsx';
 import Registration from '@pages/Authorization/Registration/Registration.tsx';
 import AccessPage from '@pages/AccessPage/AccessPage.tsx';
+import ProtectedRoute from '@components/ProtectedRoute/ProtectedRoute.tsx';
 
 function App() {
   return (
@@ -21,7 +22,14 @@ function App() {
           <Route path='/Reports' element={<ReportsPage />} />
           <Route path='/Stations' element={<StationsPage />} />
           <Route path='/Stations/:stationName' element={<StationPage />} />
-          <Route path='/Access' element={<AccessPage />} />
+          <Route
+            path='/Access'
+            element={
+              <ProtectedRoute>
+                <AccessPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path='/Login' element={<Login />} />
           <Route path='/Registration' element={<Registration />} />
         </Routes>

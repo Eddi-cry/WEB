@@ -64,6 +64,7 @@ function getRefreshCookie(): string | null {
 
 function clearAuth() {
   localStorage.removeItem('access');
+  localStorage.removeItem('user');
   document.cookie = 'refresh=; Path=/; Max-Age=0';
 }
 
@@ -76,6 +77,7 @@ async function login(payload: LoginRequest) {
   const { data } = await http.post<LoginResponse>('/api/users/token/', payload);
   setAccessToken(data.access);
   setRefreshCookie(data.refresh);
+  localStorage.setItem('user', JSON.stringify(data.user));
   return data;
 }
 
@@ -92,9 +94,20 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
+function getStoredUser(): LoginResponseUser | null {
+  try {
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
 export default {
   register,
   login,
   refreshAccessToken,
   clearAuth,
+  getStoredUser,
 };

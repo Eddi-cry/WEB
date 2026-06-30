@@ -14,10 +14,11 @@ from .models import File, Station
 import uuid
 import tempfile
 from .serializer import FileSerializer, StationSerializer
-
 import paramiko
 import traceback
 from rest_framework.permissions import IsAuthenticated
+
+
 
 class StationFilesView(APIView):
     permission_classes = [AllowAny]
@@ -28,10 +29,12 @@ class StationFilesView(APIView):
         end_date_str = request.data.get('endDate')
         single_date_str = request.data.get('singleDate')
 
+        # Если передан single_date, используем его как start и end
         if single_date_str:
             start_date_str = single_date_str
             end_date_str = single_date_str
 
+        # Проверка обязательных параметров
         if not stations:
             return Response(
                 {"error": "Не выбраны станции"},
@@ -48,11 +51,24 @@ class StationFilesView(APIView):
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
 
+            # Проверка: дата начала не позже даты окончания
+            if start_date > end_date:
+                return Response(
+                    {"error": "Дата начала не может быть позже даты окончания"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Проверка: диапазон не более 365 дней
+            if (end_date - start_date).days > 365:
+                return Response(
+                    {"error": "Диапазон не может превышать 365 дней (1 год)"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             result = {}
             for station_name in stations:
                 try:
                     stations_qs = Station.objects.filter(staname__iexact=station_name)
-
                     if not stations_qs.exists():
                         result[station_name] = {"error": f"Станция '{station_name}' не найдена"}
                         continue
@@ -64,7 +80,6 @@ class StationFilesView(APIView):
                             date__gte=start_date,
                             date__lte=end_date
                         ).select_related('staid')
-
                         serializer = FileSerializer(files, many=True)
                         station_files.extend(serializer.data)
 
@@ -75,9 +90,9 @@ class StationFilesView(APIView):
 
             return Response(result, status=status.HTTP_200_OK)
 
-        except ValueError as e:
+        except ValueError:
             return Response(
-                {"error": f"Неверный формат даты. Используйте YYYY-MM-DD"},
+                {"error": "Неверный формат даты. Используйте YYYY-MM-DD"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
@@ -92,8 +107,6 @@ SSH_HOST = "172.20.1.177"
 SSH_PORT = 22
 SSH_USERNAME = "volichevm"
 SSH_PASSWORD = os.environ.get('SSH_PASSWORD')
-
-# Путь к данным на удалённом сервере
 REMOTE_BASE_PATH = "/home/volichevm/"
 
 
@@ -127,6 +140,12 @@ class DownloadArchiveView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            if (end_date - start_date).days > 365:
+                return Response(
+                    {"error": "Диапазон не может превышать 365 дней (1 год)"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(SSH_HOST, port=SSH_PORT, username=SSH_USERNAME, password=SSH_PASSWORD)
@@ -138,7 +157,6 @@ class DownloadArchiveView(APIView):
 
                 with tarfile.open(tar_path, 'w:gz') as tar:
                     file_count = 0
-
                     for station_name in stations:
                         stations_qs = Station.objects.filter(staname__iexact=station_name)
                         if not stations_qs.exists():
@@ -152,18 +170,13 @@ class DownloadArchiveView(APIView):
                             ).select_related('staid')
 
                             for file in files:
-                                remote_path = os.path.join(
-                                    file.path,
-                                    file.filename
-                                )
-
+                                remote_path = os.path.join(file.path, file.filename)
                                 print(f"🔍 Проверка: {remote_path}")
                                 local_file_path = os.path.join(tmp_dir, f"{station.staname}_{file.date}_{file.filename}")
 
                                 try:
                                     sftp.stat(remote_path)
                                     sftp.get(remote_path, local_file_path)
-
                                     if os.path.exists(local_file_path):
                                         arcname = os.path.join(
                                             file.staid.staname.upper(),
@@ -175,16 +188,13 @@ class DownloadArchiveView(APIView):
                                         print(f"✅ Добавлен: {arcname}")
                                     else:
                                         print(f"❌ Локальный файл не создан: {local_file_path}")
-
                                 except FileNotFoundError:
                                     print(f"❌ Файл не найден: {remote_path}")
                                 except Exception as e:
                                     print(f"❌ Ошибка при скачивании {remote_path}: {str(e)}")
 
-                    # ✅ Явно закрываем архив
                     tar.close()
 
-                # ✅ Закрываем sftp и ssh
                 sftp.close()
                 ssh.close()
 
@@ -195,7 +205,6 @@ class DownloadArchiveView(APIView):
                         status=status.HTTP_404_NOT_FOUND
                     )
 
-                # ✅ Возвращаем только JSON, без Content-Disposition
                 return Response({
                     'success': True,
                     'download_url': request.build_absolute_uri(f"http://172.20.1.244:8080/media/{tar_filename}"),

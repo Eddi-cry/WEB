@@ -9,11 +9,15 @@ import ArchiveDownloadInfo from './ArchiveDownloadInfo.tsx';
 import ArchiveResults from './ArchiveResults.tsx';
 import { ArchiveDownload, ArchiveFilesByStation } from '@/types/types.ts';
 
+type DateMode = 'single' | 'range';
+
 function ArchiveAccess() {
   const [selectedStations, setSelectedStations] = useState<string[]>([]);
   const allSelected: boolean = selectedStations.length === activeStationsNames.length;
+  const [dateMode, setDateMode] = useState<DateMode>('range');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [singleDate, setSingleDate] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [results, setResults] = useState<ArchiveFilesByStation | null>(null);
@@ -30,13 +34,37 @@ function ArchiveAccess() {
     setSelectedStations(allSelected ? [] : activeStationsNames);
   }
 
+  function getDatePayload() {
+    if (dateMode === 'single') {
+      return { startDate: singleDate, endDate: singleDate };
+    }
+    return { startDate, endDate };
+  }
+
+  function validateDates(): string | null {
+    if (dateMode === 'single') {
+      if (!singleDate) return 'Выберите дату';
+      return null;
+    }
+    if (!startDate || !endDate) return 'Укажите начало и конец периода';
+    if (endDate < startDate) return 'Дата окончания не может быть раньше даты начала';
+    return null;
+  }
+
   async function sendRequest(url: string) {
-    return await http.post(url, { stations: selectedStations, startDate, endDate });
+    const dates = getDatePayload();
+    return await http.post(url, { stations: selectedStations, ...dates });
   }
 
   async function handleDownload() {
     if (selectedStations.length === 0) {
       setError('Выберите хотя бы одну станцию');
+      return;
+    }
+
+    const dateError = validateDates();
+    if (dateError) {
+      setError(dateError);
       return;
     }
 
@@ -81,6 +109,12 @@ function ArchiveAccess() {
       return;
     }
 
+    const dateError = validateDates();
+    if (dateError) {
+      setError(dateError);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setResults(null);
@@ -104,11 +138,20 @@ function ArchiveAccess() {
 
   function handleReset() {
     setSelectedStations([]);
+    setDateMode('range');
     setStartDate('');
     setEndDate('');
+    setSingleDate('');
     setResults(null);
     setDownloadInfo(null);
     setError(null);
+  }
+
+  function handleDateModeChange(mode: DateMode) {
+    setDateMode(mode);
+    setStartDate('');
+    setEndDate('');
+    setSingleDate('');
   }
 
   return (
@@ -132,27 +175,64 @@ function ArchiveAccess() {
           </div>
           <div className='stations__criteria-time'>
             <h3 className='stations__criteria-title'>Временной запрос</h3>
-            <div className='stations__criteria-inputs'>
-              <label className='stations__criteria-label'>
+            <div className='stations__date-mode'>
+              <label className='stations__date-mode-option'>
                 <input
-                  type='date'
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className='stations__criteria-input'
-                  required
+                  type='radio'
+                  name='dateMode'
+                  value='single'
+                  checked={dateMode === 'single'}
+                  onChange={() => handleDateModeChange('single')}
                 />
+                Один день
               </label>
-              <label className='stations__criteria-label'>
-                –
+              <label className='stations__date-mode-option'>
                 <input
-                  type='date'
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className='stations__criteria-input'
-                  required
+                  type='radio'
+                  name='dateMode'
+                  value='range'
+                  checked={dateMode === 'range'}
+                  onChange={() => handleDateModeChange('range')}
                 />
+                Период
               </label>
             </div>
+            {dateMode === 'single' ? (
+              <div className='stations__criteria-inputs'>
+                <label className='stations__criteria-label'>
+                  Дата
+                  <input
+                    type='date'
+                    value={singleDate}
+                    onChange={(e) => setSingleDate(e.target.value)}
+                    className='stations__criteria-input'
+                    required
+                  />
+                </label>
+              </div>
+            ) : (
+              <div className='stations__criteria-inputs'>
+                <label className='stations__criteria-label'>
+                  <input
+                    type='date'
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className='stations__criteria-input'
+                    required
+                  />
+                </label>
+                <label className='stations__criteria-label'>
+                  –
+                  <input
+                    type='date'
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className='stations__criteria-input'
+                    required
+                  />
+                </label>
+              </div>
+            )}
           </div>
           <div className='stations__buttons'>
             <Button

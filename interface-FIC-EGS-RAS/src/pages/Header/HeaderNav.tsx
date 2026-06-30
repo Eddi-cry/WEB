@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '@context/AuthContext.tsx';
 
 function HeaderNav() {
+  const { isAuthenticated, logout } = useAuth();
+
   return (
     <div className='header__nav-container'>
       <nav className='header__nav'>
@@ -18,13 +21,21 @@ function HeaderNav() {
         </Link>
       </nav>
       <div className='header__auth'>
-        <Link to='/Login' className='header__auth-link'>
-          Вход
-        </Link>
-        <span className='header__auth-slash'>/</span>
-        <Link to='/Registration' className='header__auth-link'>
-          Регистрация
-        </Link>
+        {isAuthenticated ? (
+          <button type='button' className='header__auth-link header__auth-logout' onClick={logout}>
+            Выход
+          </button>
+        ) : (
+          <>
+            <Link to='/Login' className='header__auth-link'>
+              Вход
+            </Link>
+            <span className='header__auth-slash'>/</span>
+            <Link to='/Registration' className='header__auth-link'>
+              Регистрация
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

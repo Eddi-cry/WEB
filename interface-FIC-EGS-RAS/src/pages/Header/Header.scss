@@ -52,6 +52,18 @@
   }
 
   &__auth {
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+
+    &-logout {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
     &-slash {
       color: variables.$black-color;
       font-size: variables.$font-size-s;
