@@ -11,7 +11,7 @@ function ArchiveResults({ results }: { results: ArchiveFilesByStation }) {
 
   return (
     <div className='stations__results'>
-      <h3>Найденные данные:</h3>
+      <h3>Найденные данные</h3>
 
       <table className='results-table'>
         <thead>
@@ -19,7 +19,6 @@ function ArchiveResults({ results }: { results: ArchiveFilesByStation }) {
             <th>Станция</th>
             <th>Дата</th>
             <th>Имя файла</th>
-            <th>Путь</th>
             <th>Полнота данных (%)</th>
           </tr>
         </thead>
@@ -30,13 +29,12 @@ function ArchiveResults({ results }: { results: ArchiveFilesByStation }) {
                 <td>{file.station.toUpperCase()}</td>
                 <td>{file.date}</td>
                 <td>{file.filename}</td>
-                <td className='path-cell'>{file.path}</td>
-                <td>{file.fullness}%</td>
+                <td className={file.fullness >= 90 ? 'fullness--high' :  file.fullness >= 60 ? 'fullness--medium' : 'fullness--low'}>{file.fullness}%</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5} className='no-data'>
+              <td colSpan={4} className='no-data'>
                 Нет данных за выбранный период
               </td>
             </tr>

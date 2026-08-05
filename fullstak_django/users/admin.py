@@ -15,6 +15,7 @@ class NewUserAdmin(UserAdmin):
         'phone',
         'department',
         'organization',
+        'position',
         'is_active',
         'is_staff',
         'start_date'

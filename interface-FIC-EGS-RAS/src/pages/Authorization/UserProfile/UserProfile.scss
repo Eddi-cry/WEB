@@ -1,0 +1,44 @@
+@use '@styles/mixins.scss';
+@use '@styles/variables.scss';
+
+.profile {
+  &__container {
+    @include mixins.auth-container(5vh, 45%, auto);
+    min-width: 344px;
+  }
+
+  &__info {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+    margin: 20px 0;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    row-gap: 4px;
+  }
+
+  &__label {
+    color: variables.$second-color;
+    font-size: variables.$font-size-xxs;
+  }
+
+  &__value {
+    color: variables.$black-color;
+    font-size: variables.$font-size-xs;
+  }
+
+  &__status {
+    color: variables.$main-color;
+    font-size: variables.$font-size-xxs;
+  }
+
+  &__actions {
+    display: flex;
+    column-gap: 12px;
+    margin-top: 10px;
+  }
+}

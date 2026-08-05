@@ -52,7 +52,6 @@ function Login() {
             placeholder='Почта'
           />
           {loginError && <p className='login__form-error'>{loginError.message}</p>}
-
           <input
             {...register('password', {
               required: 'Пароль обязательный',
@@ -63,10 +62,20 @@ function Login() {
             placeholder='Пароль'
           />
           {passwordError && <p className='login__form-error'>{passwordError.message}</p>}
-
           {submitError && <p className='login__form-error'>{submitError}</p>}
         </form>
         <Button form='login__form' type='submit' aim='login' content={'Войти'}></Button>
+        <p className='login__text'>
+            <a href='/ResetPassword' className='login__link'>
+              Забыли пароль?
+          </a>
+        </p>
+        <p className='login__text'>
+          У вас нет аккаунта?{' '}
+          <a href='/Registration' className='login__link'>
+            Зарегистрируйтесь
+          </a>
+        </p>
       </div>
     </section>
   );

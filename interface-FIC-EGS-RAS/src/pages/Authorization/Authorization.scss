@@ -2,7 +2,9 @@
 @use '@styles/variables.scss';
 
 .login,
-.reg {
+.reg,
+.reset,
+.profile {
   display: flex;
   justify-content: center;
 
@@ -50,6 +52,12 @@
 
     &-error {
       color: variables.$error-color;
+      font-size: variables.$font-size-xxs;
+      margin-top: -20px;
+    }
+
+    &-success {
+      color: variables.$main-color;
       font-size: variables.$font-size-xxs;
       margin-top: -20px;
     }

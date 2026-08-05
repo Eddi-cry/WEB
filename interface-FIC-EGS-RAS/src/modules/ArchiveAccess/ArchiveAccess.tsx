@@ -1,8 +1,9 @@
 import './ArchiveAccess.scss';
 import { activeStationsNames } from '@constants/constants.ts';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Checkbox from '@components/CustomInput/Checkbox.tsx';
 import Button from '@components/Button/Button.tsx';
+import DateRangePicker from '@components/DateRangePicker/DateRangePicker.tsx';
 import http from '@services/http.ts';
 import ArchiveError from './ArchiveError.tsx';
 import ArchiveDownloadInfo from './ArchiveDownloadInfo.tsx';
@@ -48,6 +49,16 @@ function ArchiveAccess() {
     }
     if (!startDate || !endDate) return 'Укажите начало и конец периода';
     if (endDate < startDate) return 'Дата окончания не может быть раньше даты начала';
+    
+    // Проверка на разницу в 1 год уже есть в DateRangePicker, но добавим на всякий случай
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 365) {
+      return 'Разница между датами не может превышать 1 год';
+    }
+    
     return null;
   }
 
@@ -152,6 +163,7 @@ function ArchiveAccess() {
     setStartDate('');
     setEndDate('');
     setSingleDate('');
+    setError(null);
   }
 
   return (
@@ -159,6 +171,7 @@ function ArchiveAccess() {
       <form onSubmit={handleSubmit} onReset={handleReset}>
         <div className='stations__container'>
           <h2 className='stations__title'>Доступ к архиву данных ГНСС-наблюдений</h2>
+          
           <div className='stations__list'>
             <h3 className='stations__list-title'>Список станций</h3>
             <div className='stations__list-radio'>
@@ -173,67 +186,23 @@ function ArchiveAccess() {
               <Checkbox checked={allSelected} onChange={handleSelectAll} content={'Выбрать все'} />
             </div>
           </div>
+          
           <div className='stations__criteria-time'>
-            <h3 className='stations__criteria-title'>Временной запрос</h3>
-            <div className='stations__date-mode'>
-              <label className='stations__date-mode-option'>
-                <input
-                  type='radio'
-                  name='dateMode'
-                  value='single'
-                  checked={dateMode === 'single'}
-                  onChange={() => handleDateModeChange('single')}
-                />
-                Один день
-              </label>
-              <label className='stations__date-mode-option'>
-                <input
-                  type='radio'
-                  name='dateMode'
-                  value='range'
-                  checked={dateMode === 'range'}
-                  onChange={() => handleDateModeChange('range')}
-                />
-                Период
-              </label>
-            </div>
-            {dateMode === 'single' ? (
-              <div className='stations__criteria-inputs'>
-                <label className='stations__criteria-label'>
-                  Дата
-                  <input
-                    type='date'
-                    value={singleDate}
-                    onChange={(e) => setSingleDate(e.target.value)}
-                    className='stations__criteria-input'
-                    required
-                  />
-                </label>
-              </div>
-            ) : (
-              <div className='stations__criteria-inputs'>
-                <label className='stations__criteria-label'>
-                  <input
-                    type='date'
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className='stations__criteria-input'
-                    required
-                  />
-                </label>
-                <label className='stations__criteria-label'>
-                  –
-                  <input
-                    type='date'
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className='stations__criteria-input'
-                    required
-                  />
-                </label>
-              </div>
-            )}
+            <h3 className='stations__criteria-title'>Временной запрос (макс. 1 год)</h3>
+            <DateRangePicker
+              dateMode={dateMode}
+              onDateModeChange={handleDateModeChange}
+              startDate={startDate}
+              endDate={endDate}
+              singleDate={singleDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+              onSingleDateChange={setSingleDate}
+              error={error}
+              onErrorChange={setError}
+            />
           </div>
+          
           <div className='stations__buttons'>
             <Button
               onClick={() => handleDownload()}
@@ -251,10 +220,12 @@ function ArchiveAccess() {
           </div>
         </div>
       </form>
-
-      {error && <ArchiveError error={error} />}
-      {downloadInfo && <ArchiveDownloadInfo {...downloadInfo} />}
-      {results && <ArchiveResults results={results} />}
+      
+      <div className='stations__results__container'>
+        {error && <ArchiveError error={error} />}
+        {downloadInfo && <ArchiveDownloadInfo {...downloadInfo} />}
+        {results && <ArchiveResults results={results} />}
+      </div>
     </section>
   );
 }

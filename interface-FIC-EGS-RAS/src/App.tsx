@@ -9,7 +9,9 @@ import StationsPage from '@pages/StationPage/StationsPage.tsx';
 import Login from '@pages/Authorization/Login/Login.tsx';
 import Registration from '@pages/Authorization/Registration/Registration.tsx';
 import AccessPage from '@pages/AccessPage/AccessPage.tsx';
+import ResetPassword from '@pages/Authorization/ResetPassword/ResetPassword.tsx';
 import ProtectedRoute from '@components/ProtectedRoute/ProtectedRoute.tsx';
+import UserProfile from '@pages/Authorization/UserProfile/UserProfile.tsx';
 
 function App() {
   return (
@@ -30,8 +32,25 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path='/UserProfile'
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
           <Route path='/Login' element={<Login />} />
           <Route path='/Registration' element={<Registration />} />
+
+          {/* Маршрут для ссылок из письма (в формате /reset-password-confirm/uid/token/) */}
+          <Route path='/reset-password-confirm/:uid/:token' element={<ResetPassword />} />
+
+          {/* Общий маршрут для страницы восстановления (без параметров) */}
+          <Route path='/ResetPassword' element={<ResetPassword />} />
+
+          {/* Альтернативный маршрут с параметрами (если ссылка в другом формате) */}
+          <Route path='/ResetPassword/:uid/:token' element={<ResetPassword />} />
         </Routes>
         <Footer />
       </div>

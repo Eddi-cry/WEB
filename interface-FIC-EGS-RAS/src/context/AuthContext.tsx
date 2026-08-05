@@ -1,19 +1,19 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import authService, { type LoginResponseUser } from '@services/authService.ts';
+import authService, { type UserProfile } from '@services/authService.ts';
 
 interface AuthContextType {
-  user: LoginResponseUser | null;
+  user: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  setUser: (user: LoginResponseUser | null) => void;
+  setUser: (user: UserProfile | null) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<LoginResponseUser | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

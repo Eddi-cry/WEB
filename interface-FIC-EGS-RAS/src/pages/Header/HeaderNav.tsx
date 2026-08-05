@@ -22,9 +22,15 @@ function HeaderNav() {
       </nav>
       <div className='header__auth'>
         {isAuthenticated ? (
-          <button type='button' className='header__auth-link header__auth-logout' onClick={logout}>
-            Выход
-          </button>
+          <>
+            <Link to='/UserProfile' className='header__auth-link'>
+              Профиль
+            </Link>
+            <span className='header__auth-slash'>/</span>
+            <button type='button' className='header__auth-link header__auth-logout' onClick={logout}>
+              Выход
+            </button>
+          </>
         ) : (
           <>
             <Link to='/Login' className='header__auth-link'>

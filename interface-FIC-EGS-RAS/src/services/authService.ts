@@ -41,6 +41,38 @@ export interface LoginResponseUser {
   is_staff: boolean;
 }
 
+export interface UserProfile extends LoginResponseUser {
+  last_name?: string;
+  first_name?: string;
+  patronymic?: string;
+  phone?: string;
+  department?: string;
+  position?: string;
+}
+
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetConfirmRequest {
+  uid: string;
+  token: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+export interface UpdateProfileRequest {
+  email: string;
+  user_name: string;
+  last_name: string;
+  first_name: string;
+  patronymic: string;
+  phone: string;
+  organization: string;
+  department: string;
+  position: string;
+}
+
 export interface LoginResponse {
   refresh: string;
   access: string;
@@ -94,7 +126,7 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
-function getStoredUser(): LoginResponseUser | null {
+function getStoredUser(): UserProfile | null {
   try {
     const raw = localStorage.getItem('user');
     if (!raw) return null;
@@ -104,10 +136,46 @@ function getStoredUser(): LoginResponseUser | null {
   }
 }
 
+function setStoredUser(user: UserProfile) {
+  localStorage.setItem('user', JSON.stringify(user));
+}
+
+// 🔄 Восстановление пароля — пути с дефисом (соответствуют бэкенду)
+async function requestPasswordReset(payload: PasswordResetRequest) {
+  const { data } = await http.post<{ detail: string }>('/api/users/password-reset/', payload);
+  return data;
+}
+
+async function confirmPasswordReset(payload: PasswordResetConfirmRequest) {
+  const { data } = await http.post<{ detail: string }>(
+    '/api/users/password-reset/confirm/',
+    payload,
+  );
+  return data;
+}
+
+// 👤 Профиль
+async function getProfile() {
+  const { data } = await http.get<UserProfile>('/api/users/me/');
+  setStoredUser(data);
+  return data;
+}
+
+async function updateProfile(payload: UpdateProfileRequest) {
+  const { data } = await http.patch<UserProfile>('/api/users/me/', payload);
+  setStoredUser(data);
+  return data;
+}
+
 export default {
   register,
   login,
   refreshAccessToken,
   clearAuth,
   getStoredUser,
+  setStoredUser,
+  requestPasswordReset,
+  confirmPasswordReset,
+  getProfile,
+  updateProfile,
 };

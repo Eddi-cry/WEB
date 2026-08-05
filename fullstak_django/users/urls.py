@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import CookieTokenObtainPairView, CookieTokenRefreshView, get_csrf
+from .views import CookieTokenObtainPairView, CookieTokenRefreshView, get_csrf, PasswordResetView, PasswordResetConfirmView
 
 urlpatterns = [
     path('register/', views.register_view, name='register'),
@@ -10,4 +10,6 @@ urlpatterns = [
     path('token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('csrf/', get_csrf, name='get_csrf'),
+    path('password-reset/', PasswordResetView.as_view(), name='password-reset'),
+    path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ]

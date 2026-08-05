@@ -1,4 +1,3 @@
-# users/views.py
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -6,8 +5,37 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 
 from .serializers import UserSerializer, RegisterSerializer
+from django.core.mail import send_mail
+from django.conf import settings
 
 User = get_user_model()
+
+def send_registration_email(user):
+    """Отправляет письмо с данными нового пользователя администратору"""
+    subject = "Новый пользователь зарегистрировался"
+    message = f"""
+    Зарегистрирован новый пользователь:
+
+    Email: {user.email}
+    Имя пользователя: {user.user_name}
+    Имя: {user.first_name}
+    Фамилия: {user.last_name}
+    Отчество: {user.patronymic}
+    Телефон: {user.phone}
+    Организация: {user.organization}
+    Подразделение: {user.department}
+    Должность: {user.position}
+    Дата регистрации: {user.start_date}
+    Активен: {"Да" if user.is_active else "Нет"}
+    Администратор: {"Да" if user.is_staff else "Нет"}
+    """
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        ['maksim.volichev@yandex.ru'],
+        fail_silently=False,
+    )
 
 # 1. Регистрация
 @api_view(['POST'])
@@ -16,6 +44,7 @@ def register_view(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        send_registration_email(user)
         return Response({
             "message": "User created successfully",
             "user": UserSerializer(user).data
@@ -23,7 +52,6 @@ def register_view(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# 2. Профиль текущего пользователя
 class MeView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -31,6 +59,12 @@ class MeView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
+    def patch(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 3. Список всех пользователей (только для админов)
 class UserListView(APIView):
@@ -137,3 +171,30 @@ class CookieTokenRefreshView(TokenRefreshView):
                 del response.data['refresh']
 
         return response
+
+
+from .serializers import PasswordResetSerializer, PasswordResetConfirmSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+
+class PasswordResetView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "Письмо со ссылкой для сброса отправлено."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "Пароль успешно изменён."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
